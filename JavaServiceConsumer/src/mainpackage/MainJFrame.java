@@ -68,7 +68,7 @@ public class MainJFrame extends javax.swing.JFrame {
                 });
             }
 
-            // for Person in the list
+            // for each Person in the list
             for (int j = 0; j < rowsCount; j++) {
                 
                 // doesn't work because the field is inaccessible

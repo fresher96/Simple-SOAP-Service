@@ -48,17 +48,21 @@ namespace ServiceConsumer
 
             DataTable table = new DataTable();
             DataView view = new DataView(table);
+
+            // for each property in Person class
             for (int i = 0; i < props.Count; i++)
             {
                 PropertyDescriptor prop = props[i];
                 table.Columns.Add(prop.Name, prop.PropertyType);
 
-                if(i == 0 && prop.Name.ToLower() == "id" && prop.PropertyType == typeof(int))
+                // if `id` exists, sort data based on it in descending order
+                if (i == 0 && prop.Name.ToLower() == "id" && prop.PropertyType == typeof(int))
                 {
                     view.Sort = string.Format("{0} DESC", prop.Name); // expected "Id DESC"
                 }
             }
 
+            // for each Person in the list
             object[] values = new object[props.Count];
             foreach (T item in data)
             {
