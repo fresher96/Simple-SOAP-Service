@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package mainpackage;
 
 import java.beans.PropertyDescriptor;
@@ -18,30 +14,24 @@ import javax.swing.JTable;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-/**
- *
- * @author Farouk
- */
 public class MainJFrame extends javax.swing.JFrame {
 
     private ServiceRef.WebService1Soap stub;
 
-    /**
-     * Creates new form MainJFrame
-     */
     public MainJFrame() {
         try {
             initComponents();
             stub = new ServiceRef.WebService1().getWebService1Soap();
             populate(stub.getList());
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
+            JOptionPane.showMessageDialog(null, ex.getMessage());
         }
     }
 
     private void populate(ServiceRef.ArrayOfPerson rawList) throws Exception {
         List<ServiceRef.Person> list = rawList.getPerson();
         JTable table = getTable(list);
+        jScrollPane2.getViewport().removeAll();
         jScrollPane2.getViewport().add(table);
     }
 
@@ -54,11 +44,12 @@ public class MainJFrame extends javax.swing.JFrame {
         String[] columns = new String[columnsCount];
         Object[][] data = new Object[rowsCount][columnsCount];
 
+        // for each field in Person class
         for (int i = 0; i < columnsCount; i++) {
             Field f = (ServiceRef.Person.class.getDeclaredFields())[i];
             columns[i] = f.getName();
-            f.getType();
 
+            // if `id` exists, sort data based on it in descending order
             if (i == 0 && f.getName().compareToIgnoreCase("id") == 0 && f.getType() == int.class) {
                 Collections.sort(list, new Comparator<ServiceRef.Person>() {
                     @Override
@@ -77,8 +68,12 @@ public class MainJFrame extends javax.swing.JFrame {
                 });
             }
 
+            // for Person in the list
             for (int j = 0; j < rowsCount; j++) {
+                
+                // doesn't work because the field is inaccessible
                 //data[j][i] = f.get(list.get(j));
+                
                 PropertyDescriptor pd = new PropertyDescriptor(f.getName(), ServiceRef.Person.class);
                 if (f.getType() != XMLGregorianCalendar.class) {
                     data[j][i] = pd.getReadMethod().invoke(list.get(j), new Object[0]);
@@ -233,7 +228,7 @@ public class MainJFrame extends javax.swing.JFrame {
         try {
             populate(stub.getList());
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
+            JOptionPane.showMessageDialog(null, ex.getMessage());
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -252,7 +247,7 @@ public class MainJFrame extends javax.swing.JFrame {
             ServiceRef.ArrayOfPerson list = stub.addPerson(firstName, lastName, dateOfBirth);
             populate(list);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
+            JOptionPane.showMessageDialog(null, ex.getMessage());
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
