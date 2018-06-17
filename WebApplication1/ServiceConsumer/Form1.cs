@@ -18,14 +18,28 @@ namespace ServiceConsumer
 
         private void add_Click(object sender, EventArgs e)
         {
-            DateTime date = dateTimePicker1.Value.Date;
-            var list = stub.AddPerson(textBox1.Text, textBox2.Text, date);
-            Populate(list);
+            try
+            {
+                DateTime date = dateTimePicker1.Value.Date;
+                var list = stub.AddPerson(textBox1.Text, textBox2.Text, date);
+                Populate(list);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Populate(stub.GetList());
+            try
+            {
+                Populate(stub.GetList());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void Populate(ServiceRef.Person[] list)
@@ -35,8 +49,15 @@ namespace ServiceConsumer
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            stub = new ServiceRef.WebService1();
-            Populate(stub.GetList());
+            try
+            {
+                stub = new ServiceRef.WebService1();
+                Populate(stub.GetList());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
 
