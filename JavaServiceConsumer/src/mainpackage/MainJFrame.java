@@ -6,6 +6,11 @@ package mainpackage;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -41,23 +46,52 @@ public class MainJFrame extends javax.swing.JFrame {
     }
 
     // reflection code
-    // source: https://stackoverflow.com/a/1780910/4881156
-    public JTable getTable(List<ServiceRef.Person> list) throws Exception{
-        
+    public JTable getTable(List<ServiceRef.Person> list) throws Exception {
+
         int columnsCount = ServiceRef.Person.class.getDeclaredFields().length;
         int rowsCount = list.size();
-        
+
         String[] columns = new String[columnsCount];
         Object[][] data = new Object[rowsCount][columnsCount];
-        
-        for (int i=0; i<columnsCount; i++) {
+
+        for (int i = 0; i < columnsCount; i++) {
             Field f = (ServiceRef.Person.class.getDeclaredFields())[i];
             columns[i] = f.getName();
-            
-            for(int j=0; j<rowsCount; j++){
+            f.getType();
+
+            if (i == 0 && f.getName().compareToIgnoreCase("id") == 0 && f.getType() == int.class) {
+                Collections.sort(list, new Comparator<ServiceRef.Person>() {
+                    @Override
+                    public int compare(ServiceRef.Person lhs, ServiceRef.Person rhs) {
+                        int lhsId = lhs.getId();
+                        int rhsId = rhs.getId();
+
+                        if (lhsId == rhsId) {
+                            return 0;
+                        } else if (lhsId < rhsId) {
+                            return 1;
+                        } else {
+                            return -1;
+                        }
+                    }
+                });
+            }
+
+            for (int j = 0; j < rowsCount; j++) {
                 //data[j][i] = f.get(list.get(j));
                 PropertyDescriptor pd = new PropertyDescriptor(f.getName(), ServiceRef.Person.class);
-                data[j][i] = pd.getReadMethod().invoke(list.get(j), new Object[0]);
+                if (f.getType() != XMLGregorianCalendar.class) {
+                    data[j][i] = pd.getReadMethod().invoke(list.get(j), new Object[0]);
+                } else {
+                    XMLGregorianCalendar dateOfBirth;
+                    dateOfBirth = (XMLGregorianCalendar) (pd.getReadMethod().invoke(list.get(j), new Object[0]));
+                    Date date = dateOfBirth.toGregorianCalendar().getTime();
+
+                    DateFormat outputFormatter = new SimpleDateFormat("M/d/yyyy");
+                    String output = outputFormatter.format(date);
+
+                    data[j][i] = output;
+                }
             }
         }
 
