@@ -53,7 +53,7 @@ namespace ServiceConsumer
                 PropertyDescriptor prop = props[i];
                 table.Columns.Add(prop.Name, prop.PropertyType);
 
-                if(i == 0 && prop.Name.ToLower() == "id")
+                if(i == 0 && prop.Name.ToLower() == "id" && prop.PropertyType == typeof(int))
                 {
                     view.Sort = string.Format("{0} DESC", prop.Name); // expected "Id DESC"
                 }
