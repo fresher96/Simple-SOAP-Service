@@ -3,8 +3,13 @@
  * and open the template in the editor.
  */
 package mainpackage;
+
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.util.GregorianCalendar;
+import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -20,14 +25,42 @@ public class MainJFrame extends javax.swing.JFrame {
      * Creates new form MainJFrame
      */
     public MainJFrame() {
-        initComponents();
-        stub = new ServiceRef.WebService1().getWebService1Soap();
-        populate(stub.getList());
+        try {
+            initComponents();
+            stub = new ServiceRef.WebService1().getWebService1Soap();
+            populate(stub.getList());
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage());
+        }
     }
 
-    private void populate(ServiceRef.ArrayOfPerson list) {
-        ServiceRef.Person person = list.getPerson().get(0);
-        person.getDateOfBirth().getClass();
+    private void populate(ServiceRef.ArrayOfPerson rawList) throws Exception {
+        List<ServiceRef.Person> list = rawList.getPerson();
+        getTable(list);
+    }
+
+    // reflection code
+    // source: https://stackoverflow.com/a/1780910/4881156
+    public JTable getTable(List<ServiceRef.Person> list) throws Exception{
+        
+        int columnsCount = ServiceRef.Person.class.getDeclaredFields().length;
+        int rowsCount = list.size();
+        
+        String[] columns = new String[columnsCount];
+        Object[][] data = new Object[rowsCount][columnsCount];
+        
+        for (int i=0; i<columnsCount; i++) {
+            Field f = (ServiceRef.Person.class.getDeclaredFields())[i];
+            columns[i] = f.getName();
+            
+            for(int j=0; j<rowsCount; j++){
+                //data[j][i] = f.get(list.get(j));
+                PropertyDescriptor pd = new PropertyDescriptor(f.getName(), ServiceRef.Person.class);
+                data[j][i] = pd.getReadMethod().invoke(list.get(j), new Object[0]);
+            }
+        }
+
+        return new JTable(data, columns);
     }
 
     /**
@@ -41,7 +74,7 @@ public class MainJFrame extends javax.swing.JFrame {
 
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        table = new javax.swing.JTable();
         jTextField1 = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
@@ -63,7 +96,7 @@ public class MainJFrame extends javax.swing.JFrame {
             }
         });
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -74,7 +107,7 @@ public class MainJFrame extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(table);
 
         jLabel1.setText("firstName");
 
@@ -179,7 +212,7 @@ public class MainJFrame extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
-            //JOptionPane.showMessageDialog(this, helloWorld());
+            populate(stub.getList());
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage());
         }
@@ -189,14 +222,14 @@ public class MainJFrame extends javax.swing.JFrame {
         try {
             String firstName = jTextField1.getText();
             String lastName = jTextField2.getText();
-            
+
             int year = Integer.parseInt(jTextField3.getText());
             int month = Integer.parseInt(jTextField4.getText()) - 1;
             int day = Integer.parseInt(jTextField5.getText());
-            
+
             GregorianCalendar date = new GregorianCalendar(year, month, day);
             XMLGregorianCalendar dateOfBirth = DatatypeFactory.newInstance().newXMLGregorianCalendar(date);
-            
+
             ServiceRef.ArrayOfPerson list = stub.addPerson(firstName, lastName, dateOfBirth);
             populate(list);
         } catch (Exception ex) {
@@ -248,11 +281,11 @@ public class MainJFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField5;
+    private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
 }
