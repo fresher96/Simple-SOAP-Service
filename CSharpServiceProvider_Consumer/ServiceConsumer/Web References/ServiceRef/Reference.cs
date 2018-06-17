@@ -29,8 +29,6 @@ namespace ServiceConsumer.ServiceRef {
     [System.Web.Services.WebServiceBindingAttribute(Name="WebService1Soap", Namespace="http://tempuri.org/")]
     public partial class WebService1 : System.Web.Services.Protocols.SoapHttpClientProtocol {
         
-        private System.Threading.SendOrPostCallback GetPersonOperationCompleted;
-        
         private System.Threading.SendOrPostCallback AddPersonOperationCompleted;
         
         private System.Threading.SendOrPostCallback GetListOperationCompleted;
@@ -76,9 +74,6 @@ namespace ServiceConsumer.ServiceRef {
         }
         
         /// <remarks/>
-        public event GetPersonCompletedEventHandler GetPersonCompleted;
-        
-        /// <remarks/>
         public event AddPersonCompletedEventHandler AddPersonCompleted;
         
         /// <remarks/>
@@ -86,33 +81,6 @@ namespace ServiceConsumer.ServiceRef {
         
         /// <remarks/>
         public event HelloWorldCompletedEventHandler HelloWorldCompleted;
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://tempuri.org/GetPerson", RequestNamespace="http://tempuri.org/", ResponseNamespace="http://tempuri.org/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public Person GetPerson() {
-            object[] results = this.Invoke("GetPerson", new object[0]);
-            return ((Person)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void GetPersonAsync() {
-            this.GetPersonAsync(null);
-        }
-        
-        /// <remarks/>
-        public void GetPersonAsync(object userState) {
-            if ((this.GetPersonOperationCompleted == null)) {
-                this.GetPersonOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetPersonOperationCompleted);
-            }
-            this.InvokeAsync("GetPerson", new object[0], this.GetPersonOperationCompleted, userState);
-        }
-        
-        private void OnGetPersonOperationCompleted(object arg) {
-            if ((this.GetPersonCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.GetPersonCompleted(this, new GetPersonCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://tempuri.org/AddPerson", RequestNamespace="http://tempuri.org/", ResponseNamespace="http://tempuri.org/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
@@ -285,32 +253,6 @@ namespace ServiceConsumer.ServiceRef {
             }
             set {
                 this.dateOfBirthField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1590.0")]
-    public delegate void GetPersonCompletedEventHandler(object sender, GetPersonCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1590.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class GetPersonCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal GetPersonCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public Person Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((Person)(this.results[0]));
             }
         }
     }
